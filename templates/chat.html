@@ -1,0 +1,50 @@
+{% extends 'base.html' %} 
+{% block title %} Chat Room {% endblock title %}
+{% block content %}
+
+<div>
+  <a href="{% url 'home' %}">home</a>
+</div>
+
+<br>
+
+<div id="chat-log" style="border:1px solid;width:500px;height:400px;">
+
+{% if messages %}
+  {% for message in messages %}
+  <p>{{ message.author }}: {{ message.content }}</p>
+  {% endfor %}
+{% endif %}
+
+</div>
+
+<br>
+<input id="chat-message-input" type="text" size="60" placeholder="type message">
+<br>
+<br>
+
+<input id="chat-message-submit" type="button" value="Send">
+
+<script>
+
+base_url =  'ws://' + window.location.hostname + ':' + window.location.port + '/ws/open_chat/' + "{{ uuid }}" + '/';
+
+chatSocket = new WebSocket(base_url);
+
+chatSocket.onmessage = function(event){
+    let parsed = JSON.parse(event.data);
+    document.querySelector('#chat-log').innerHTML += '<p>' + parsed.message + '</p>';
+}
+
+document.querySelector('#chat-message-submit').onclick = function(e) {
+    const messageInputDom = document.querySelector('#chat-message-input');
+        const message = messageInputDom.value;
+        chatSocket.send(JSON.stringify({
+        'message': message
+        }));
+    messageInputDom.value = '';
+    };
+
+</script>
+
+{% endblock content %}

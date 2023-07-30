@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %} Home {% endblock title %}
+{% block content %}
+    <h1 style="margin-top: 3px;">Home Page</h1>
+
+    {% if user.is_authenticated %}
+      <h2>Hi {{ user }}!</h2>
+      <a href="{% url 'logout' %}" class="btn btn-secondary">Log out</a>
+      <a href="{% url 'new_group' %}" class="btn btn-secondary">New group</a>
+
+    <ul>
+      {% for group in groups %}
+      <div id="{{ group.uuid }}">
+        <li><a>{{ group.uuid }}</a></li>
+          {% if request.user in group.members.all %}
+            <a href="{% url 'open_chat' uuid=group.uuid %}">Open</a>
+            <a href="{% url 'leave_group' uuid=group.uuid %}">Leave</a>
+            <a href="{% url 'remove_group' uuid=group.uuid %}">Delete</a>
+          {% else %}
+            <a href="{% url 'join_group' uuid=group.uuid %}">Join</a>
+          {% endif %}
+      </div>
+      {% endfor %}
+    </ul>
+
+    {% else %}
+      <h2>Hmm, who are you?</h2><a href="{% url 'login' %}" class="btn btn-secondary">Log in</a> OR <a href="{% url 'signup' %}" class="btn btn-info">Sign up</a>
+    {% endif %}
+
+{% endblock content %}
+    
